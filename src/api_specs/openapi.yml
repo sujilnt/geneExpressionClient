@@ -1,0 +1,46 @@
+openapi: "3.0.0"
+info:
+  title: Finder
+  description: A web app for finding PDCM gene expression data for end-users based on data-set.
+  version: 1.0.0
+paths:
+  /genes:
+    get:
+      tags:
+        - genes
+      summary: Retrieves the expression gene data for end-users
+      description: Retrieves the expression gene data for end-users
+      operationId: getExpressionData
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GeneExpression"
+components:
+  schemas:
+    GeneExpression:
+      type: object
+      description: A model to gene expression data.
+      properties:
+        model_id:
+          type: string
+        gene_symbol:
+          type: string
+        z_score:
+          type: number
+        diagnosis:
+          type: string
+        platform_id:
+          type: string
+        chromosome:
+          type: string
+        seq_start_position:
+          type: number
+        seq_end_position:
+          type: number
+        gene_id_ensembl:
+          type: string

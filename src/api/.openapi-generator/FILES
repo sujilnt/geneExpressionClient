@@ -1,0 +1,7 @@
+.openapi-generator-ignore
+apis/GenesApi.ts
+apis/index.ts
+index.ts
+models/GeneExpression.ts
+models/index.ts
+runtime.ts
