@@ -2,11 +2,16 @@ import { Dispatch, useDispatch, useSelector } from 'umi';
 import { Form } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 
-import {Filters, GeneAction} from "@/pages/model";
+import {FilterOptions, Filters, GeneAction} from "@/pages/model";
 
 import type {Option} from "react-bootstrap-typeahead/types/types";
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 
+
+interface ChartProps{
+  filterOptions: FilterOptions
+  selectedFilters: FilterOptions
+}
 
 function getDispatchMethods(dispatch: Dispatch){
   return{
@@ -23,11 +28,10 @@ function getDispatchMethods(dispatch: Dispatch){
 
 
 
-export default function ChartFilters(props){
-  const { filterOptions, selectedFilters  }= props;
+export default function ChartFilters(props:ChartProps){
+  const { filterOptions, selectedFilters }= props;
   const { onChange } = getDispatchMethods(useDispatch());
 
-  console.log("props", props);
   return(
     <div>
       <Form.Group>
@@ -58,7 +62,5 @@ export default function ChartFilters(props){
         />
       </Form.Group>
     </div>
-
-  )
-
+  );
 }

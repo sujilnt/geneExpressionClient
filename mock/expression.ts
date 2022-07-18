@@ -2,7 +2,20 @@ import fetch from 'node-fetch';
 import {Request,Response} from "express";
 import {GeneExpression} from "@/api";
 
-
+/**
+ * const test = [{
+ *   id: "gene_symbol",
+ *   data:[
+ *     {
+ *       x: "model_id",
+ *       y: "zScore",
+ *       diagnosis: "diagnosis",
+ *       chromosome,
+ *       seq_start_position,
+ *       seq_end_position
+ *     }
+ *   ]
+ */
 /**
  *  A helper method that converts text files (tsv format)
  *  to array of objects
@@ -40,7 +53,6 @@ function convertTsvToJSON(textFile:string){
   return geneExpressions;
 }
 
-
 export default {
   "GET /genes": (request:Request,response:Response) =>{
     setTimeout(async () => {
@@ -49,7 +61,6 @@ export default {
 
       const data = await res.text();
       const expressions:GeneExpression[] = convertTsvToJSON(data);
-
       response.json(expressions);
     }, 1000);
   }

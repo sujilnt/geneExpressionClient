@@ -8,6 +8,7 @@ import {GeneAction} from "@/pages/model";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './index.less';
 import ChartFilters from "@/components/Filters";
+import HeatMapChart from "@/components/HeatMap";
 
 function getDispatchedMethods(dispatch: Dispatch){
   return{
@@ -56,6 +57,11 @@ export default function Index() {
         filterOptions={filterOptions}
         selectedFilters={selectedFilters}
       />
+      <div className={styles.chartContainer}>
+        <HeatMapChart selectedFilters={selectedFilters} data={geneExpressions}/>
+      </div>
+
+
     </div>
   );
 }

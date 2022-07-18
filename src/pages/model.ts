@@ -3,6 +3,43 @@ import {GeneExpression} from "@/api";
 
 import type { Put } from 'redux-saga/effects';
 
+/**
+ *  Groupping the genes expression data based on modelId and genesymbol
+ * @param expression
+ */
+function groupByModelIdAndGeneSymbol(expression:GeneExpression[]){
+  return expression?.reduce((acc:any, expression)=>{
+    const id = `${expression.modelId}-${expression.geneSymbol}`;
+    if(!acc[id]) {
+      acc[id] = [];
+    }
+    acc[id].push(expression);
+    return acc;
+  },{});
+}
+
+
+/**
+ * Aggregating the average zscores of same model_id and gene_symbol
+ * @param expressions
+ */
+function aggregateAndAverageZscores(expressions:GeneExpression[]):GeneExpression{
+  const averageOf = expressions.length;
+  return expressions.reduce((acc, expression, index)=>{
+    if(Object.keys(acc).length === 0){
+      acc = expression
+      return acc;
+    }
+
+    const newScore = Number(acc.zScore) + Number(expression.zScore);
+    acc.zScore = ((averageOf-1) === index)
+      ? (newScore/averageOf)
+      :newScore;
+
+    return acc;
+  },{})
+}
+
 export enum GeneAction {
   FETCH_EXPRESSION_DATA = 'FETCH_EXPRESSION_DATA',
   SET_EXPRESSION_DATA = 'SET_EXPRESSION_DATA',
@@ -16,7 +53,7 @@ export enum Filters {
   DiagnosisList= 'diagnosisList'
 }
 
-type FilterOptions = {
+export type FilterOptions = {
   [Filters.GeneSymbols]?: string[],
   [Filters.DiagnosisList]?: string[]
 }
@@ -59,8 +96,22 @@ export default {
   },
   effects:{
     *[GeneAction.FETCH_EXPRESSION_DATA](_payload: any, {put, call} : {put:Put, call:Function}){
+      let geneExpressions:GeneExpression[] = [];
       try{
-        const geneExpressions:GeneExpression[] = yield call(()=>api.genes.getExpressionData());
+        geneExpressions = yield call(()=>api.genes.getExpressionData());
+        if(geneExpressions?.length){
+          let groupedExpressions : GeneExpression[][] = Object.values(groupByModelIdAndGeneSymbol(geneExpressions));
+          geneExpressions = groupedExpressions.reduce((acc, geneExpressions)=>{
+            if(geneExpressions.length === 1){
+              acc.push(geneExpressions[0]);
+            } else {
+              acc.push(aggregateAndAverageZscores(geneExpressions))
+            }
+            return acc;
+
+          }, []) as GeneExpression[];
+        }
+
         yield put.resolve({
           type: GeneAction.SET_EXPRESSION_DATA,
           geneExpressions
