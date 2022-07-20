@@ -1,6 +1,6 @@
 import React, {memo, useCallback, useMemo} from "react";
 import {Dispatch, useDispatch} from 'umi';
-import {Select,Card,Button,Slider,Tooltip} from 'antd';
+import {Select,Card,Button,Slider} from 'antd';
 import {FilterOptions, Filters, GeneAction} from "@/pages/model";
 
 import styles from "./style.less";
@@ -90,20 +90,19 @@ function ChartFilters(props:ChartProps){
           </div>
         </div>
       </Card>
-      <div className={styles.container}>
+      <div className={styles.container} style={{margin: "14px auto 0 auto"}}>
         <div className={styles.formGroup}>
-          <Tooltip title={`Filters top ${zScorePercentage}% of genes based on highest gene expression (z-score)`}>
-            <h3 className={styles.title}>z-score (%)</h3>
-            <Slider
-              tooltipVisible
-              min={1}
-              max={100}
-              tooltipPlacement="bottom"
-              onChange={onzScorePercentageChange}
-              value={zScorePercentage}
-              disabled={isDataEmpty}
-            />
-          </Tooltip>
+          <h3 className={styles.title}>
+            {`Filters top ${zScorePercentage}% of genes based on highest gene expression (z-score)`}
+          </h3>
+          <Slider
+            tooltipVisible
+            min={1}
+            max={100}
+            onChange={onzScorePercentageChange}
+            value={zScorePercentage}
+            disabled={isDataEmpty}
+          />
         </div>
       </div>
     </div>
