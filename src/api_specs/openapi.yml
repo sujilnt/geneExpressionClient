@@ -47,7 +47,7 @@ components:
         platform_id:
           type: string
         chromosome:
-          type: string
+          type: number
         seq_start_position:
           type: number
         seq_end_position:

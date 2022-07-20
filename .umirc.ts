@@ -1,15 +1,12 @@
 import { defineConfig } from 'umi';
 
 export default defineConfig({
-  nodeModulesTransform: {
-    type: 'none',
+  define: {
+    API_URL: process.env.API_URL || 'http://localhost:8000',
   },
-  routes: [
-    { path: '/', component: '@/pages/index' },
-  ],
   fastRefresh: {},
   dva: {
     immer: true, // Enable dva-immer for elegant reducer writing experience
   },
-  antd: {}
+  antd: {},
 });

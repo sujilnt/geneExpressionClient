@@ -12,7 +12,8 @@
     "strict": true,
     "paths": {
       "@/*": ["src/*"],
-      "@@/*": ["src/.umi/*"]
+      "@@/*": ["src/.umi/*"],
+      "@/service": ["src/service/*"]
     },
     "allowSyntheticDefaultImports": true
   },
@@ -21,7 +22,8 @@
     "src/**/*",
     "config/**/*",
     ".umirc.ts",
-    "typings.d.ts"
+    "typings.d.ts",
+    "jest.config.js"
   ],
   "exclude": [
     "node_modules",

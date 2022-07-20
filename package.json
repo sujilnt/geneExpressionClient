@@ -30,9 +30,11 @@
     "@openapitools/openapi-generator-cli": "^2.4.26",
     "react": "17.x",
     "react-dom": "17.x",
+    "react-router": "^6.3.0",
     "umi": "^3.5.30"
   },
   "devDependencies": {
+    "@types/jest": "^28.1.6",
     "@types/node-fetch": "^2.6.2",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
