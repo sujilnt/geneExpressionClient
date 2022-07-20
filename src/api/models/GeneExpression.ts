@@ -30,49 +30,49 @@ export interface GeneExpression {
      * @type {string}
      * @memberof GeneExpression
      */
-    geneSymbol?: string;
+    geneSymbol: string;
     /**
      * 
      * @type {number}
      * @memberof GeneExpression
      */
-    zScore?: number;
+    zScore: number;
     /**
      * 
      * @type {string}
      * @memberof GeneExpression
      */
-    diagnosis?: string;
+    diagnosis: string;
     /**
      * 
      * @type {string}
      * @memberof GeneExpression
      */
-    platformId?: string;
+    platformId: string;
     /**
      * 
      * @type {string}
      * @memberof GeneExpression
      */
-    chromosome?: string;
+    chromosome: string;
     /**
      * 
      * @type {number}
      * @memberof GeneExpression
      */
-    seqStartPosition?: number;
+    seqStartPosition: number;
     /**
      * 
      * @type {number}
      * @memberof GeneExpression
      */
-    seqEndPosition?: number;
+    seqEndPosition: number;
     /**
      * 
      * @type {string}
      * @memberof GeneExpression
      */
-    geneIdEnsembl?: string;
+    geneIdEnsembl: string;
 }
 
 /**
@@ -80,6 +80,14 @@ export interface GeneExpression {
  */
 export function instanceOfGeneExpression(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "geneSymbol" in value;
+    isInstance = isInstance && "zScore" in value;
+    isInstance = isInstance && "diagnosis" in value;
+    isInstance = isInstance && "platformId" in value;
+    isInstance = isInstance && "chromosome" in value;
+    isInstance = isInstance && "seqStartPosition" in value;
+    isInstance = isInstance && "seqEndPosition" in value;
+    isInstance = isInstance && "geneIdEnsembl" in value;
 
     return isInstance;
 }
@@ -95,14 +103,14 @@ export function GeneExpressionFromJSONTyped(json: any, ignoreDiscriminator: bool
     return {
         
         'modelId': !exists(json, 'model_id') ? undefined : json['model_id'],
-        'geneSymbol': !exists(json, 'gene_symbol') ? undefined : json['gene_symbol'],
-        'zScore': !exists(json, 'z_score') ? undefined : json['z_score'],
-        'diagnosis': !exists(json, 'diagnosis') ? undefined : json['diagnosis'],
-        'platformId': !exists(json, 'platform_id') ? undefined : json['platform_id'],
-        'chromosome': !exists(json, 'chromosome') ? undefined : json['chromosome'],
-        'seqStartPosition': !exists(json, 'seq_start_position') ? undefined : json['seq_start_position'],
-        'seqEndPosition': !exists(json, 'seq_end_position') ? undefined : json['seq_end_position'],
-        'geneIdEnsembl': !exists(json, 'gene_id_ensembl') ? undefined : json['gene_id_ensembl'],
+        'geneSymbol': json['gene_symbol'],
+        'zScore': json['z_score'],
+        'diagnosis': json['diagnosis'],
+        'platformId': json['platform_id'],
+        'chromosome': json['chromosome'],
+        'seqStartPosition': json['seq_start_position'],
+        'seqEndPosition': json['seq_end_position'],
+        'geneIdEnsembl': json['gene_id_ensembl'],
     };
 }
 

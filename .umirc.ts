@@ -11,5 +11,5 @@ export default defineConfig({
   dva: {
     immer: true, // Enable dva-immer for elegant reducer writing experience
   },
-  antd: false
+  antd: {}
 });

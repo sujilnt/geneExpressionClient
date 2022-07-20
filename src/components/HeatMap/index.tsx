@@ -1,29 +1,33 @@
-import { ResponsiveHeatMap } from '@nivo/heatmap';
-import {useCallback} from "react";
-import {GeneExpression} from "@/api";
-import {Filters} from "@/pages/model";
-import {AxisProps} from "@nivo/axes";
-import {ContinuousColorScaleConfig} from "@nivo/colors";
-import {HeatMapCommonProps, HeatMapDatum} from "@nivo/heatmap/dist/types/types";
-import {Datum} from "@nivo/legends";
-import styles from "./style.less";
+import {memo} from "react";
+import { ResponsiveHeatMapCanvas } from '@nivo/heatmap';
 
+import GeneDiagnosisGroups from "@/components/GeneDiagnosisGroups";
 
-interface ChartOptions extends HeatMapCommonProps<any>{
-  axisTop: AxisProps| null,
-  axisRight: AxisProps| null,
-  axisLeft: AxisProps| null,
-  colors: ContinuousColorScaleConfig,
+import type {ContinuousColorScaleConfig} from "@nivo/colors";
+import type {AnchoredContinuousColorsLegendProps} from "@nivo/legends";
+import type {GeneExpression} from "@/api";
+import type {CanvasAxisProps} from "@nivo/axes";
+
+interface ChartOptions{
+  margin: object;
+  axisTop: CanvasAxisProps<string> | null;
+  axisRight: CanvasAxisProps<string>| null;
+  axisLeft: CanvasAxisProps<string>| null;
+  colors: ContinuousColorScaleConfig;
+  legends: Omit<AnchoredContinuousColorsLegendProps, 'scale' | 'containerWidth' | 'containerHeight'>[];
+}
+
+interface HeatMapChartProps{
+  data: GeneExpression[];
+  diagnosisList?: string[]
 }
 
 const chartConfig: ChartOptions= {
-  margin:{ top: 50, right: 90, left: 90, bottom: 50 },
+  margin:{ top: 50, right: 115, left: 90, bottom: 50 },
   axisTop: {
     tickSize: 8,
     tickPadding: 5,
     tickRotation: 0,
-    legend: 'model id',
-    legendPosition: 'middle',
     legendOffset: 28
   },
   axisRight:{
@@ -45,7 +49,7 @@ const chartConfig: ChartOptions= {
   legends:[
     {
       anchor: 'top-right',
-      translateX: 75,
+      translateX: 90,
       translateY: -12,
       length: 427,
       thickness: 11,
@@ -54,9 +58,9 @@ const chartConfig: ChartOptions= {
       tickSize: 3,
       tickSpacing: 4,
       tickOverlap: false,
-      tickFormat: '>-.2s',
-      title: 'Value →',
-      titleAlign: 'start',
+      tickFormat: '^ .3g',
+      title: 'Value ( zscores ) → ',
+      titleAlign: 'middle',
       titleOffset: 4
     }
   ],
@@ -68,43 +72,55 @@ const chartConfig: ChartOptions= {
     steps: 7
   }
 }
-export default function HeatMapChart(props){
-  const {selectedFilters, data} = props;
-  const getData = useCallback((data: GeneExpression[])=>{
-    return data.reduce((acc:any, geneExpression:GeneExpression)=>{
-       const expression = acc.find((acc)=>acc.id=== geneExpression.geneSymbol);
+const getData = (data: GeneExpression[])=>{
+  return data.reduce((acc:any, geneExpression:GeneExpression)=>{
+    const expression = acc.find(({id}:{id:string})=>acc.id=== geneExpression.geneSymbol);
 
-       if(!expression?.id){
-         acc.push({
-           id: geneExpression.geneSymbol,
-           data: [{
-             x: geneExpression.modelId,
-             y: geneExpression.zScore,
-           }]
-         });
-       } else{
-         expression.data.push({
-           x: geneExpression.modelId,
-           y: geneExpression.zScore,
-         });
-       }
+    if(!expression?.id){
+      acc.push({
+        id: geneExpression.geneSymbol,
+        data: [{
+          x: geneExpression.modelId,
+          y: geneExpression.zScore,
+          diagnosis: geneExpression.diagnosis
+        }]
+      });
+    } else{
+      expression.data.push({
+        x: geneExpression.modelId,
+        y: geneExpression.zScore,
+        diagnosis: geneExpression.diagnosis
+      });
+    }
 
-       return acc;
-     },[]);
-  }, [selectedFilters[Filters.GeneSymbols], selectedFilters[Filters.DiagnosisList]]);
+    return acc;
+  },[]);
+};
+
+
+function HeatMapChart({data, diagnosisList}:HeatMapChartProps){
+  const chartData = getData(data);
 
 return(
-  <ResponsiveHeatMap
-    className={styles.heatmap}
-    data={data?.length ? getData(data): []}
-    margin={chartConfig.margin}
-    valueFormat=" ^ .3g"
-    axisTop={chartConfig.axisTop}
-    axisRight={chartConfig.axisRight}
-    axisLeft={chartConfig.axisLeft}
-    colors={chartConfig.colors}
-    emptyColor="#555555"
-    legends={chartConfig.legends}
-  />
-)
+  <>
+    { chartData?.length && diagnosisList?.length
+       ? <GeneDiagnosisGroups data={data}  diagnosisList={diagnosisList} />
+       : null
+    }
+    <ResponsiveHeatMapCanvas
+      data={chartData}
+      margin={chartConfig.margin}
+      valueFormat=" ^ .3g"
+      axisTop={chartConfig.axisTop}
+      axisRight={chartConfig.axisRight}
+      axisLeft={chartConfig.axisLeft}
+      colors={chartConfig.colors}
+      emptyColor="#555555"
+      legends={chartConfig.legends}
+      hoverTarget="cell"
+    />
+  </>
+  );
 }
+
+export default memo(HeatMapChart)

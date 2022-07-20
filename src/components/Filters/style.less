@@ -1,0 +1,37 @@
+.container{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 14px auto 32px auto;
+  width: 90%;
+
+  & :global(.ant-card-body){
+    width: 100%;
+  }
+}
+
+.flexColumn{
+  display: flex;
+  flex-direction:row;
+  flex-wrap: wrap;
+
+  & .formGroup:last-child{
+    align-self: flex-end;
+    display: flex;
+    justify-content: flex-end;
+    max-width: 150px;
+  }
+}
+.formGroup{
+  margin: 12px 17px 5px 5px;
+  flex:1 350px;
+}
+
+.diagnosisSelectionField,
+.genesSelectionField{
+  width: 100%;
+}
+
+.title{
+font-weight: 400;
+}

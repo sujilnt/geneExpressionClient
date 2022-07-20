@@ -25,6 +25,16 @@ components:
     GeneExpression:
       type: object
       description: A model to gene expression data.
+      required:
+        - model_Id
+        - gene_symbol
+        - z_score
+        - diagnosis
+        - platform_id
+        - chromosome
+        - seq_end_position
+        - seq_start_position
+        - gene_id_ensembl
       properties:
         model_id:
           type: string
