@@ -1,6 +1,5 @@
 import {memo} from "react";
 import { ResponsiveHeatMapCanvas } from '@nivo/heatmap';
-
 import GeneDiagnosisGroups from "@/components/GeneDiagnosisGroups";
 
 import type {ContinuousColorScaleConfig} from "@nivo/colors";

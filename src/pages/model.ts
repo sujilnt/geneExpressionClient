@@ -2,6 +2,33 @@ import api from "@/service/api";
 import {GeneExpression} from "@/api";
 
 import type { Put } from 'redux-saga/effects';
+export enum GeneAction {
+  FETCH_EXPRESSION_DATA = 'FETCH_EXPRESSION_DATA',
+  SET_EXPRESSION_DATA = 'SET_EXPRESSION_DATA',
+  SET_FILTER_OPTIONS = 'SET_FILTER_OPTIONS',
+  SET_SELECTED_FILTERS = 'SET_SELECTED_FILTERS ',
+  SET_FILTERED_DATA = 'SET_FILTERED_DATA',
+  SET_ZSCORE_PERCENTAGE = 'SET_ZSCORE_PERCENTAGE',
+  RESET_STATE = 'RESET_STATE'
+};
+
+export enum Filters {
+  GeneSymbols = 'geneSymbols',
+  DiagnosisList= 'diagnosisList'
+}
+
+export type FilterOptions = {
+  [Filters.GeneSymbols]?: string[],
+  [Filters.DiagnosisList]?: string[]
+}
+
+export interface GeneState {
+  geneExpressions?: GeneExpression[];
+  filterOptions: FilterOptions;
+  selectedFilters: FilterOptions;
+  filteredGeneExpressions?: GeneExpression[];
+  zScorePercentage: number
+}
 
 function applyFilters(geneExpressions:GeneExpression[], selectedFilters: FilterOptions){
   const geneSymbols = new Set(selectedFilters.geneSymbols);
@@ -46,7 +73,8 @@ function groupByModelIdAndGeneSymbol(expression:GeneExpression[]){
 
 /**
  * Aggregating the average zscores of same model_id and gene_symbol
- * @param expressions
+ * @param GeneExpression[]
+ * return the aggregate and average z-score
  */
 function aggregateAndAverageZscores(expressions:GeneExpression[]): GeneExpression {
   const lastItemIndex = expressions.length - 1;
@@ -64,32 +92,12 @@ function sortByDiagnosis(arr:GeneExpression[], diagnosisList:string[]){
   });
 }
 
-export enum GeneAction {
-  FETCH_EXPRESSION_DATA = 'FETCH_EXPRESSION_DATA',
-  SET_EXPRESSION_DATA = 'SET_EXPRESSION_DATA',
-  SET_FILTER_OPTIONS = 'SET_FILTER_OPTIONS',
-  SET_SELECTED_FILTERS = 'SET_SELECTED_FILTERS ',
-  SET_FILTERED_DATA = 'SET_FILTERED_DATA',
-  SET_ZSCORE_PERCENTAGE = 'SET_ZSCORE_PERCENTAGE',
-  RESET_STATE = 'RESET_STATE'
-};
-
-export enum Filters {
-  GeneSymbols = 'geneSymbols',
-  DiagnosisList= 'diagnosisList'
-}
-
-export type FilterOptions = {
-  [Filters.GeneSymbols]?: string[],
-  [Filters.DiagnosisList]?: string[]
-}
-
-export interface GeneState {
-  geneExpressions?: GeneExpression[];
-  filterOptions: FilterOptions;
-  selectedFilters: FilterOptions;
-  filteredGeneExpressions?: GeneExpression[];
-  zScorePercentage: number
+function filterByzScorePercentage(arr: GeneExpression[],zScorePercentage: number){
+  const totalValue = zScorePercentage === 0
+    ? 0
+    : Math.round((zScorePercentage / 100 * arr.length) - 1);
+  const sortedByDescendingOrder = arr.sort((a, b)=> b.zScore - a.zScore);
+  return sortedByDescendingOrder.filter((_,i)=> i <= totalValue);
 }
 
 const initialState: GeneState = {
@@ -121,20 +129,10 @@ export default {
     },
     [GeneAction.SET_ZSCORE_PERCENTAGE](state: GeneState, {zScorePercentage}:{zScorePercentage: number}){
       const {geneExpressions, filterOptions,selectedFilters} = state;
-      // @ts-ignore Object is possibly undefined;
+      const diagnosisList = filterOptions[Filters.DiagnosisList];
+
       if(!!geneExpressions){
-        const totalValue = zScorePercentage === 0 ? 0: Math.round((zScorePercentage/100* geneExpressions.length) - 1);
-        // sorting the z-score in descending order
-        const sortByZscore = geneExpressions.sort((a:GeneExpression ,b:GeneExpression)=> {
-          return (b?.zScore || 0) - (a?.zScore|| 0)
-        });
-
-        const diagnosisList = filterOptions[Filters.DiagnosisList];
-        const updateGeneExpressions = sortByDiagnosis(sortByZscore.filter((_a,i)=> i <= totalValue),
-          diagnosisList as string[]
-        );
-
-
+        const updateGeneExpressions = sortByDiagnosis(filterByzScorePercentage(geneExpressions, zScorePercentage), diagnosisList as string[]);
         state.zScorePercentage = zScorePercentage;
         state.filteredGeneExpressions = applyFilters(updateGeneExpressions, selectedFilters);
       }
@@ -183,9 +181,10 @@ export default {
           diagnosisList
         });
 
+
         yield put.resolve({
           type: GeneAction.SET_EXPRESSION_DATA,
-          geneExpressions: sortByDiagnosis(geneExpressions, diagnosisList as string[])
+          geneExpressions: sortByDiagnosis(filterByzScorePercentage(geneExpressions, 100), diagnosisList as string[])
         });
 
       } catch (e) {

@@ -2,6 +2,7 @@ import React, {memo, useCallback, useMemo} from "react";
 import {Dispatch, useDispatch} from 'umi';
 import {Select,Card,Button,Slider,Tooltip} from 'antd';
 import {FilterOptions, Filters, GeneAction} from "@/pages/model";
+
 import styles from "./style.less";
 
 interface ChartProps{
@@ -95,7 +96,7 @@ function ChartFilters(props:ChartProps){
             <h3 className={styles.title}>z-score (%)</h3>
             <Slider
               tooltipVisible
-              min={0}
+              min={1}
               max={100}
               tooltipPlacement="bottom"
               onChange={onzScorePercentageChange}

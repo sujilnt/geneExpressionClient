@@ -1,6 +1,6 @@
 import React, {memo, useMemo} from "react";
-import type {GeneExpression} from "@/api";
 
+import type {GeneExpression} from "@/api";
 import styles from "./style.less";
 
 interface GeneDiagnosisGroupsProps{
@@ -44,7 +44,7 @@ function GeneDiagnosisGroups({data, diagnosisList}: GeneDiagnosisGroupsProps){
   return(
     <div className={styles.container}>
       {diagnosisData?.map((diagnosis) =>
-        <div key={diagnosis} className={styles.item} style={calcWidth(measurements[diagnosis].size, totalMeasurements)}>
+        <div key={diagnosis} className={styles.item} style={calcWidth(measurements[diagnosis]?.size, totalMeasurements)}>
         {diagnosis}
       </div>)
       }
